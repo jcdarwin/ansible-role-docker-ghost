@@ -1,0 +1,18 @@
+#!/bin/bash
+cd {{ ghost.install_dir }}/content
+:
+OUTPUT=`git status`
+if grep -q 'Changes not staged for commit' <<<$OUTPUT ||  grep -q 'Untracked files' <<<$OUTPUT; then
+    git add .
+
+    echo "[`date`] Commiting to repo..."
+    git commit -m "`date`"
+    echo "[`date`] Commited."
+
+    echo "[`date`] Pushing to our remote..."
+	# We're the source of truth, so force the push
+    git push --force origin master
+    echo "[`date`] Changes pushed to master branch."
+else
+    echo "[`date`] No changes detected. Nothing has been pushed."
+fi

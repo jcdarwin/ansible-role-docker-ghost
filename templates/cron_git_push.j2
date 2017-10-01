@@ -1,0 +1,4 @@
+#!/bin/bash
+mkdir -p /var/log/cron.daily
+
+. {{ ghost.install_dir }}/content/git_push.sh >> /var/log/cron.daily/git_push.log

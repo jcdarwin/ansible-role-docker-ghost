@@ -1,0 +1,100 @@
+---
+# tasks file for ansible-role-docker-ghost
+
+# - name: Show the result of our vars
+#   debug: var=ghost
+#   tags:
+#   - traefik
+#   - ghost
+#   - docker
+
+- name: Ensure ghost directories exist
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+  - "{{ ghost.install_dir }}"
+  - "{{ ghost.install_dir }}/content"
+  tags:
+  - traefik
+  - ghost
+  - docker
+
+# Presumes we've run ansible-role-users to create our git config
+- name: ensure our git checkout exists
+  git:
+    repo: "{{ ghost.remote }}"
+    dest: "{{ ghost.install_dir }}/content"
+    update: no
+  tags:
+  - traefik
+  - ghost
+  - docker
+
+- name: add our git push script
+  template: >
+    src=../templates/git_push.sh.j2
+    dest="{{ ghost.install_dir }}/content/git_push.sh"
+    mode=0755
+  tags:
+  - traefik
+  - ghost
+  - docker
+
+# https://github.com/jcdarwin/docker-ghost-alpine
+- name: Deploy ghost blog container
+  docker_container:
+    name: ghost
+    image: mebooks/docker-ghost-alpine
+    restart_policy: unless-stopped
+    volumes:
+    - /etc/localtime:/etc/localtime:ro
+    - /etc/ghost/content:/var/lib/ghost/content
+    env:
+      url: "https://{{ ghost.domain }}"
+    labels:
+      traefik.enable: "true"
+      traefik.backend: ghost
+      traefik.frontend.rule: "Host:{{ ghost.domain }}"
+      traefik.port: "2368"
+  tags:
+  - traefik
+  - ghost
+  - docker
+
+- name: Move in our config
+  template: >
+    src=../templates/config.production.json.j2
+    dest="{{ ghost.install_dir }}/content/config.production.json"
+    mode=0640
+  tags:
+  - traefik
+  - ghost
+  - docker
+
+# ###############
+# # cron jobs
+- name: Set a daily cron job to git push any changes
+  action: template
+    src=templates/cron_git_push.j2
+    dest=/etc/cron.daily/cron_git_push
+    mode=0755
+  tags:
+  - traefik
+  - ghost
+  - docker
+
+- name: Check that our cron is valid
+  command: run-parts --test --verbose /etc/cron.daily
+  register: result
+  tags:
+  - traefik
+  - ghost
+  - docker
+
+- name: Show the result of our cron
+  debug: var=result
+  tags:
+  - traefik
+  - ghost
+  - docker
