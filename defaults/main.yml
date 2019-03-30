@@ -1,9 +1,11 @@
 ---
 # defaults file for mebooks.ansible-role-docker-ghost
-owner: admin
 
-ansible_role_docker_ghost:
+ghost:
+  owner: admin
+  owner_password: WHATEVER
   domain: domain.tld
+  source: domain.tld
   install_dir: /etc/ghost
   remote: git@bitbucket.org:whever/blog.git
   mail:

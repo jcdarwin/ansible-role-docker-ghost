@@ -33,14 +33,16 @@ Role Variables
 
 For let's encrypt certificate, and automatic reverse proxy
 
-- `owner`  defaults to *admin*
-- `ansible_role_docker_ghost.domain` defaults to *domain.tld*
-- `ansible_role_docker_ghost.install_dir` defaults to */etc/ghost*
-- `ansible_role_docker_ghost.remote` defaults to *git@bitbucket.org:whever/blog.git*
-- `ansible_role_docker_ghost.mail.transport` defaults to *SMTP*
-- `ansible_role_docker_ghost.mail.smtp_service` defaults to *Mailgun*
-- `ansible_role_docker_ghost.mail.user` defaults to *postmaster@blog.domain.tld*
-- `ansible_role_docker_ghost.mail.pass` defaults to *password*
+- `ghost.owner`  defaults to *admin*
+- `ghost.owner_password`  defaults to *WHATEVER*
+- `ghost.domain` defaults to *domain.tld*
+- `ghost.source`: defaults to *domain.tld*
+- `ghost.install_dir` defaults to */etc/ghost*
+- `ghost.remote` defaults to *git@bitbucket.org:whever/blog.git*
+- `ghost.mail.transport` defaults to *SMTP*
+- `ghost.mail.smtp_service` defaults to *Mailgun*
+- `ghost.mail.user` defaults to *postmaster@blog.domain.tld*
+- `ghost.mail.pass` defaults to *password*
 
 Dependencies
 ------------
@@ -64,8 +66,8 @@ Example Playbook
     email: mebooks.support@gmail.com
     users:
      # owner_password / owner_password_encrypted are defined in the unversioned group_vars/remote
-    - username: "{{ owner }}"
-      password: "{{ owner_password }}"
+    - username: "{{ ghost.owner }}"
+      password: "{{ ghost.owner_password }}"
       acl:
       - traefik
 

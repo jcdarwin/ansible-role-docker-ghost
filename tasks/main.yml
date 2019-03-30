@@ -57,6 +57,7 @@
       traefik.backend: ghost
       traefik.frontend.rule: "Host:{{ ghost.domain }}"
       traefik.port: "2368"
+      com.datadoghq.ad.logs: '[{"source": "do.mebooks.co.nz", "service": "ghost"}]'
   tags:
   - traefik
   - ghost
