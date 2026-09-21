@@ -7,7 +7,7 @@ ghost:
   domain: domain.tld
   source: domain.tld
   install_dir: /etc/ghost
-  remote: git@bitbucket.org:whever/blog.git
+  remote: git@github.com:whoever/blog.git
   mail:
     transport: SMTP # or SES
     smtp_service: Mailgun # or ~
