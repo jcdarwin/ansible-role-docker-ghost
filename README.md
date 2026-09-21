@@ -28,6 +28,30 @@ Developed and tested on *Ubuntu Server 16.10 Yakkety*, but should work on other 
 
 It's running on Docker.
 
+Deploy Key
+----------
+
+`ansible-role-users` generates a single SSH keypair on the server at `/root/.ssh/id_rsa` and prints the public key — it does **not** register it with any git remote for you. Before this role can clone (and before the daily cron job can force-push) `ghost.remote`, a public key must be manually added as a **deploy key with write access** on the remote repo:
+
+* GitHub: repo → Settings → Deploy keys → Add deploy key → tick "Allow write access"
+* Bitbucket: repo → Repository settings → Access keys → Add key
+
+GitHub does not allow the same public key to be used as a deploy key on more than one repository. If this server already uses its shared `/root/.ssh/id_rsa` as a deploy key elsewhere (e.g. for a wiki repo via `ansible-role-docker-gollum`), generate a dedicated keypair for the blog repo instead and add an alias in `/root/.ssh/config`, e.g.:
+
+```
+ssh-keygen -t ed25519 -f /root/.ssh/id_ed25519_blog_github -N '' -C "ghost-blog-deploy-key"
+```
+
+```
+Host github.com-blog
+    HostName github.com
+    User git
+    IdentityFile /root/.ssh/id_ed25519_blog_github
+    IdentitiesOnly yes
+```
+
+Then set `ghost.remote` to use that alias host, e.g. `git@github.com-blog:org/blog.git`, instead of `git@github.com:org/blog.git` directly. Note this SSH config/keypair is manual, server-side setup — it isn't (currently) created by this role, so it won't exist after a from-scratch redeploy until repeated.
+
 Role Variables
 --------------
 
@@ -38,7 +62,7 @@ For let's encrypt certificate, and automatic reverse proxy
 - `ghost.domain` defaults to *domain.tld*
 - `ghost.source`: defaults to *domain.tld*
 - `ghost.install_dir` defaults to */etc/ghost*
-- `ghost.remote` defaults to *git@bitbucket.org:whever/blog.git*
+- `ghost.remote` defaults to *git@github.com:whoever/blog.git*
 - `ghost.mail.transport` defaults to *SMTP*
 - `ghost.mail.smtp_service` defaults to *Mailgun*
 - `ghost.mail.user` defaults to *postmaster@blog.domain.tld*
@@ -60,21 +84,22 @@ Example Playbook
   become_method: sudo
 
   vars:
-    traefik_testing: true
-    owner: administrator
-    domain: mebooks.co.nz
-    email: mebooks.support@gmail.com
-    users:
-     # owner_password / owner_password_encrypted are defined in the unversioned group_vars/remote
-    - username: "{{ ghost.owner }}"
-      password: "{{ ghost.owner_password }}"
-      acl:
-      - traefik
+    traefik:
+      traefik_testing: true
+      owner: administrator
+      domain: mebooks.co.nz
+      email: mebooks.support@gmail.com
+      users:
+      # owner_password / owner_password_encrypted are defined in the unversioned group_vars/remote
+      - username: "{{ ghost.owner }}"
+        password: "{{ ghost.owner_password }}"
+        acl:
+        - traefik
 
     ghost:
       domain: blog.mebooks.co.nz
       install_dir: /etc/ghost
-      remote: git@bitbucket.org:jcdarwin/blog.git
+      remote: git@github.com-blog:nzmebooks/blog.git
       # theme_url: https://jcdarwin@bitbucket.org/jcdarwin/ghost-theme-goblin.git
       # theme_name: goblin
       mail:

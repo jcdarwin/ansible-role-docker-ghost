@@ -26,6 +26,7 @@
     repo: "{{ ghost.remote }}"
     dest: "{{ ghost.install_dir }}/content"
     update: no
+    accept_hostkey: yes
   tags:
   - traefik
   - ghost
