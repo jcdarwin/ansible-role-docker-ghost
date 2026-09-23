@@ -3,7 +3,7 @@ mebooks.ansible-role-docker-ghost
 
 Based on [rgarrigue.docker-ghost-blog](https://github.com/rgarrigue/ansible-role-docker-ghost-blog).
 
-This role installs the [dockerised ghost blog](https://github.com/jcdarwin/docker-ghost-alpine) on an Ubuntu server.
+This role installs Ghost 6 on an Ubuntu server, using the [official `ghost` Docker image](https://hub.docker.com/_/ghost) pinned to `ghost:6.65.0-alpine`, with SQLite as the database. Ghost is configured through environment variables on the container; there is no `config.production.json`.
 
 We presume the use of [Traefik](traefik.io) as our reverse proxy, and use git to back our blog content up to a repository.
 
@@ -63,6 +63,9 @@ For let's encrypt certificate, and automatic reverse proxy
 - `ghost.source`: defaults to *domain.tld*
 - `ghost.install_dir` defaults to */etc/ghost*
 - `ghost.remote` defaults to *git@github.com:whoever/blog.git*
+
+The `ghost.mail.*` variables are not currently wired into the container, so transactional mail (staff invites, password resets) is not configured.
+
 - `ghost.mail.transport` defaults to *SMTP*
 - `ghost.mail.smtp_service` defaults to *Mailgun*
 - `ghost.mail.user` defaults to *postmaster@blog.domain.tld*
