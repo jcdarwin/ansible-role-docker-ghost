@@ -63,6 +63,7 @@ For let's encrypt certificate, and automatic reverse proxy
 - `ghost.source`: defaults to *domain.tld*
 - `ghost.install_dir` defaults to */etc/ghost*
 - `ghost.remote` defaults to *git@github.com:whoever/blog.git*
+
 The `ghost.mail.*` variables are not currently wired into the container, so transactional mail (staff invites, password resets) is not configured.
 
 - `ghost.mail.transport` defaults to *SMTP*
