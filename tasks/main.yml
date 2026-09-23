@@ -42,17 +42,20 @@
   - ghost
   - docker
 
-# https://github.com/jcdarwin/docker-ghost-alpine
+# https://hub.docker.com/_/ghost
 - name: Deploy ghost blog container
   docker_container:
     name: ghost
-    image: mebooks/docker-ghost-alpine
+    image: ghost:6.65.0-alpine
     restart_policy: unless-stopped
     volumes:
     - /etc/localtime:/etc/localtime:ro
     - /etc/ghost/content:/var/lib/ghost/content
     env:
       url: "https://{{ ghost.domain }}"
+      NODE_ENV: production
+      database__client: sqlite3
+      database__connection__filename: /var/lib/ghost/content/data/ghost.db
     labels:
       traefik.enable: "true"
       traefik.backend: ghost
@@ -64,11 +67,14 @@
   - ghost
   - docker
 
-- name: Move in our config
-  template: >
-    src=../templates/config.production.json.j2
-    dest="{{ ghost.install_dir }}/content/config.production.json"
-    mode=0640
+# The content repo is owned by deploy (UID 1000, also the container's node
+# user) but the cron job runs git as root, which git refuses without this.
+- name: Let root's git operate on the content repo
+  community.general.git_config:
+    name: safe.directory
+    value: "{{ ghost.install_dir }}/content"
+    scope: global
+    add_mode: add
   tags:
   - traefik
   - ghost
