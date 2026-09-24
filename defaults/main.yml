@@ -10,6 +10,7 @@ ghost:
   remote: git@github.com:whoever/blog.git
   mail:
     transport: SMTP # or SES
+    from: '"Blog" <noreply@blog.domain.tld>'
     smtp_service: Mailgun # or ~
     user: postmaster@blog.domain.tld
     pass: password
