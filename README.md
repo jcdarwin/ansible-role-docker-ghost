@@ -64,9 +64,10 @@ For let's encrypt certificate, and automatic reverse proxy
 - `ghost.install_dir` defaults to */etc/ghost*
 - `ghost.remote` defaults to *git@github.com:whoever/blog.git*
 
-The `ghost.mail.*` variables are not currently wired into the container, so transactional mail (staff invites, password resets) is not configured.
+Transactional mail (staff invites, password resets, and the one-time code Ghost 6 emails when staff log in from a new device) is sent over SMTP using the `ghost.mail.*` variables. Without working mail, staff can't log in to the admin from a new device.
 
 - `ghost.mail.transport` defaults to *SMTP*
+- `ghost.mail.from` defaults to *"Blog" <noreply@blog.domain.tld>*; use an address on your mail provider's sending domain
 - `ghost.mail.smtp_service` defaults to *Mailgun*
 - `ghost.mail.user` defaults to *postmaster@blog.domain.tld*
 - `ghost.mail.pass` defaults to *password*

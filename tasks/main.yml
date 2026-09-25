@@ -48,6 +48,8 @@
     name: ghost
     image: ghost:6.65.0-alpine
     restart_policy: unless-stopped
+    # Starting a container can take over the 60s default on a small droplet
+    timeout: 180
     volumes:
     - /etc/localtime:/etc/localtime:ro
     - /etc/ghost/content:/var/lib/ghost/content
@@ -56,6 +58,11 @@
       NODE_ENV: production
       database__client: sqlite3
       database__connection__filename: /var/lib/ghost/content/data/ghost.db
+      mail__transport: "{{ ghost.mail.transport }}"
+      mail__from: "{{ ghost.mail.from }}"
+      mail__options__service: "{{ ghost.mail.smtp_service }}"
+      mail__options__auth__user: "{{ ghost.mail.user }}"
+      mail__options__auth__pass: "{{ ghost.mail.pass }}"
     labels:
       traefik.enable: "true"
       traefik.backend: ghost
